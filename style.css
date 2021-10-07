@@ -1,0 +1,51 @@
+body {
+    background-color: rgb(19, 8, 59);
+}
+h1 {
+    color: rgb(255, 255, 255);
+    text-align: center;
+}
+
+.gameboardContainer {
+    display: flex;
+    justify-content: space-around;
+}
+
+.gameboard {
+    width: 300px;
+    height: 300px;
+    border: 1px solid rgb(243, 239, 239);
+    display: flex;
+    flex-wrap: wrap;
+}
+
+.square {
+    width: 100px;
+    height: 100px;
+    box-sizing: border-box;
+    color: rgb(255, 254, 254);
+    border: 1px solid rgb(245, 242, 242);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-size: 50px;
+
+    cursor: pointer;
+}
+
+
+.inARow{
+    background-color: yellow;
+    color: black;
+}
+
+.player1,
+.player2 {
+    background-color: blanchedalmond;
+    width: 200px;
+    height: 200px;
+    margin-top: 50px;
+    text-align: center;
+    font-size: 40px;
+}
+
