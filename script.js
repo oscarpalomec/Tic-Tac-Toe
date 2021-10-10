@@ -9,15 +9,30 @@ const gameBoard = (() => {
     for (let i = 0; i < gameBoardArray.length; i++) {
       document.querySelector(`.s${i + 1}`).innerHTML = gameBoardArray[i];
     }
-    
   };
 
   const checkTie = () => {
     return gameBoardArray.includes("");
-  }
+  };
 
+  const consoleGameboardArray = () => {
+    console.log(gameBoardArray);
+  };
 
-  return { addMark, renderBoard, gameBoardArray, checkTie };
+  const emptyArray = () => {
+    for (let i = 0; i < gameBoardArray.length; i++) {
+      gameBoardArray[i] = "";
+    }
+  };
+
+  return {
+    addMark,
+    renderBoard,
+    gameBoardArray,
+    checkTie,
+    consoleGameboardArray,
+    emptyArray,
+  };
 })();
 
 const Player = (playerName, playerMark) => {
@@ -28,16 +43,65 @@ const Player = (playerName, playerMark) => {
 };
 
 const displayController = (() => {
-  const player1Name = document.querySelector('.player1Name');
-  const player2Name = document.querySelector('.player2Name');
+  const modalButton = document.getElementById("show-modal");
+  const addPlayersBtn = document.querySelector("#add-players-button");
+  const restartBtn = document.querySelector("#restart-button");
+  const player1Name = document.querySelector(".player1Name");
+  const player2Name = document.querySelector(".player2Name");
   const square = document.getElementsByClassName("square");
-  console.log(square.length);
+  let player1, player2;
 
-  let player1 = Player("oscar", "X");
-  let player2 = Player("Luis", "O");
+  function showModal() {
+    document.querySelector(".bg-modal").style.display = "flex";
+  }
 
+  modalButton.addEventListener("click", showModal);
+
+  addPlayersBtn.addEventListener("click", addNewPlayers);
+
+  restartBtn.addEventListener("click", restartGame);
+
+  const clearGameboard = () => {
+    for (let i = 0; i < square.length; i++) {
+      square[i].innerHTML = "";
+      square[i].classList.remove("inARow");
+      square[i].setAttribute("id", `${i}`);
+    }
+  };
+
+  const removeSquareAttribute = () => {
+    for (let i = 0; i < square.length; i++) {
+      square[i].removeAttribute("id");
+    }
+  };
+
+  function addNewPlayers(e) {
+    e.preventDefault();
+    gameBoard.emptyArray();
+    clearGameboard();
+    gameBoard.consoleGameboardArray();
+    const player1sName = document.getElementById("player1Name");
+    const player2sName = document.getElementById("player2Name");
+
+    player1 = Player(player1sName.value, "X");
+    player2 = Player(player2sName.value, "O");
+    player1Name.innerHTML = `${player1.getName}'s turn`;
+    player2Name.innerHTML = "";
+    player1sName.value = "";
+    player2sName.value = "";
+    document.querySelector(".bg-modal").style.display = "none";
+  }
+
+  function restartGame(e) {
+    e.preventDefault();
+    gameBoard.emptyArray();
+    clearGameboard();
+    gameBoard.consoleGameboardArray();
+    isplayer1Playing = true;
+    player2Name.innerHTML = "";
+    player1Name.innerHTML = `${player1.getName}'s turn`;
+  }
   gameBoard.renderBoard();
-  
 
   let isplayer1Playing = true;
 
@@ -69,59 +133,50 @@ const displayController = (() => {
         square[b].classList.add("inARow");
         square[c].classList.add("inARow");
 
-        if (isplayer1Playing){
+        if (isplayer1Playing) {
           player2Name.innerHTML = `${player2.getName} wins!`;
-        }else {
+          player1Name.innerHTML = `${player2.getName} wins!`;
+          removeSquareAttribute();
+        } else {
           player1Name.innerHTML = `${player1.getName} wins!`;
+          player2Name.innerHTML = `${player1.getName} wins!`;
+          removeSquareAttribute();
         }
       }
-
     }
-
   };
-
-
-  //Hacer una función para si hay tie
-  
 
   for (let i = 0; i < square.length; i++) {
     square[i].addEventListener("click", (e) => {
       if (isplayer1Playing) {
-        
-        console.log(square[i]);
         gameBoard.addMark(square[i].id, player1.getPlayerMark);
         if (square[i].hasAttribute("id") == true) {
           square[i].innerHTML = player1.getPlayerMark;
+          gameBoard.consoleGameboardArray();
           isplayer1Playing = false;
-          console.log(`${player2.getName}'s turn`);
           player1Name.innerHTML = "";
           player2Name.innerHTML = `${player2.getName}'s turn`;
-          
         }
         square[i].removeAttribute("id");
-        console.log(gameBoard.gameBoardArray);
         if (gameBoard.checkTie() == false) {
-          console.log('tieeee');
+          player1Name.innerHTML = "It's a tie!";
+          player2Name.innerHTML = "It's a tie!";
         }
-        
+
         e.stopPropagation();
       } else {
-        
-        console.log(square[i]);
         gameBoard.addMark(square[i].id, player2.getPlayerMark);
         if (square[i].hasAttribute("id") == true) {
           square[i].innerHTML = player2.getPlayerMark;
+          gameBoard.consoleGameboardArray();
           isplayer1Playing = true;
-          console.log(`${player1.getName}'s turn`);
           player2Name.innerHTML = "";
           player1Name.innerHTML = `${player1.getName}'s turn`;
-          
         }
         square[i].removeAttribute("id");
-
-        console.log(gameBoard.gameBoardArray);
         if (gameBoard.checkTie() == false) {
-          console.log('tieeee');
+          player1Name.innerHTML = "It's a tie!";
+          player2Name.innerHTML = "It's a tie!";
         }
         e.stopPropagation();
       }
@@ -129,22 +184,3 @@ const displayController = (() => {
     });
   }
 })();
-
-/*
-COMO FUNCIONARÁ EL JUEGO:
-
-1. El jugador 1  tira ✓
-2. Cambiar a jugador 2 ✓
-  -No puede tirar en un lugar ocupado ✓
-3. El jugador 2 tira ✓
-4. Si hay 3 in a row de una marca:
-  - El juego acaba
-      -Poner una pantalla encima para que ya no se le pueda picar a la cuadrícula
-  - Se anuncia un ganador ✓
-  - Habrá un botón de reiniciar
-      -Hacer una función para regresar todo como al inicio y ligarla al botón
-5. Si el juego acaba y no hay 3 in a row:
-  - Se anuncia que fue un empate
-6. Podría haber un solo botón y que cambie entre reiniciar y jugar
-
-*/
